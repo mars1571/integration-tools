@@ -1,0 +1,11 @@
+I, [2020-02-11T17:34:25.047027 #791]  INFO -- : Refreshing Gem list
+I, [2020-02-11T17:35:02.418258 #791]  INFO -- : listening on addr=127.0.0.1:8080 fd=18
+I, [2020-02-11T17:35:02.418414 #791]  INFO -- : listening on addr=/var/opt/gitlab/gitlab-rails/sockets/gitlab.socket fd=19
+I, [2020-02-11T17:35:02.701071 #791]  INFO -- : master process ready
+I, [2020-02-11T17:35:02.947171 #950]  INFO -- : worker=1 ready
+I, [2020-02-11T17:35:02.986170 #954]  INFO -- : worker=5 ready
+I, [2020-02-11T17:35:03.028716 #949]  INFO -- : worker=0 ready
+I, [2020-02-11T17:35:03.076048 #952]  INFO -- : worker=3 ready
+I, [2020-02-11T17:35:03.097143 #951]  INFO -- : worker=2 ready
+I, [2020-02-11T17:35:03.102772 #955]  INFO -- : worker=6 ready
+I, [2020-02-11T17:35:03.108947 #953]  INFO -- : worker=4 ready
