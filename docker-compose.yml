@@ -1,49 +1,75 @@
-version: "3"
+version: '3.5'
+
 services:
 
-    web:
-      image: 'gitlab/gitlab-ce:latest'
-      restart: always
-      hostname: 'gitlab'
+  mysql:
+    image: mysql:5.7.21
+    container_name: mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql/init:/docker-entrypoint-initdb.d
+      - ./mysql/conf/:/etc/mysql/conf.d
+    networks:
+      - integration_tools_net
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    restart: always
+
+  sonarqube:
+      image: sonarqube:7.0
+      container_name: sonarqube
+      depends_on:
+        - mysql
+      volumes:
+        - ./sonarqube_conf:/opt/sonarqube/conf
+        - ./sonarqube_data:/opt/sonarqube/data
+        - ./sonarqube_extensions:/opt/sonarqube/extensions
+        - ./sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+      networks:
+        - integration_tools_net
+      #command: -Dsonar.web.context=/sonarqube
+      ports:
+        - '127.0.0.1:9999:9000'
+        - '9092:9092'
       environment:
-        GITLAB_OMNIBUS_CONFIG: |
-          external_url 'http://localhost:8000'
-      ports:
-        - '8000:8000'
-        - '8443:8443'
-        - '22:22'
-      volumes:
-        - './gitlab-config:/etc/gitlab'
-        - './gitlab-logs:/var/log/gitlab'
-        - './gitlab-data:/var/opt/gitlab'
-    jenkins:
-      build:
-        context: .
-        dockerfile: Dockerfile.jenkins
+        - SONAR_JDBC_USERNAME=sonar
+        - SONAR_JDBC_PASSWORD=sonar
+        - SONAR_JDBC_URL=jdbc:mysql://mysql:3306/sonar?useUnicode=true&characterEncoding=utf8
       restart: always
-      hostname: 'jenkins'
-      ports:
-        - '8080:8080'
-        - '50000:50000'
-      volumes:
-        - './jenkins_home:/var/jenkins_home'
-        - '/var/run/docker.sock:/var/run/docker.sock'
-    sonarqube:
-      image: 'sonarqube:7.6-community'
-      ports:
-        - '9000:9000'
-      volumes:
-        - './sonarqube_conf:/opt/sonarqube/conf'
-        - './sonarqube_data:/opt/sonarqube/data'
-        - './sonarqube_logs:/opt/sonarqube/logs'
-        - './sonarqube_extensions:/opt/sonarqube/extensions'
-  
-volumes:
-    gitlab-data:
-    gitlab-logs:
-    gitlab-config:
-    jenkins_home:
-    sonarqube_conf:
-    sonarqube_data:
-    sonarqube_logs:
-    sonarqube_extensions:
+
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins
+    restart: always
+    hostname: 'jenkins'
+    ports:
+      - '8080:8080'
+      - '50000:50000'
+    volumes:
+      - './jenkins_home:/var/jenkins_home'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    networks:
+      - integration_tools_net
+
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: always
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 8822
+    ports:
+      - "8000:80"
+      - "8822:22"
+    volumes:
+      - ./gitlab_cofig:/etc/gitlab
+      - ./gitlab_data:/var/opt/gitlab
+      - ./gitlab_logs:/var/log/gitlab
+    networks:
+      - integration_tools_net
+
+networks:
+  integration_tools_net:

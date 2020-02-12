@@ -1,4 +1,0 @@
-# Logfile created on 2020-02-11 17:34:04 +0000 by logger.rb/66358
-{"severity":"INFO","time":"2020-02-11T17:34:04.698Z","correlation_id":null,"message":"User \"Administrator\" (admin@example.com) was created"}
-{"severity":"DEBUG","time":"2020-02-11T17:34:44.156Z","correlation_id":null,"message":"DB connection pool size: 25 (increased from 1 to match thread count)"}
-{"severity":"ERROR","time":"2020-02-11T17:35:32.982Z","correlation_id":null,"message":"  \n!! RUNTIME IDENTIFICATION FAILED: Failed to identify runtime for process 1123 (bin/rails)\n  Runtime based configuration settings may not work properly.\n  If you continue to see this error, please file an issue via\n  https://gitlab.com/gitlab-org/gitlab/issues/new\n"}
