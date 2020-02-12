@@ -8,8 +8,8 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./mysql/init:/docker-entrypoint-initdb.d
-      - ./mysql/conf/:/etc/mysql/conf.d
+      - ./mysql_vol/init:/docker-entrypoint-initdb.d
+      - ./mysql_vol/conf/:/etc/mysql/conf.d
     networks:
       - integration_tools_net
     environment:
@@ -17,20 +17,20 @@ services:
     restart: always
 
   sonarqube:
-      image: sonarqube:7.0
+      image: sonarqube:7.6-community
       container_name: sonarqube
       depends_on:
         - mysql
       volumes:
-        - ./sonarqube_conf:/opt/sonarqube/conf
-        - ./sonarqube_data:/opt/sonarqube/data
-        - ./sonarqube_extensions:/opt/sonarqube/extensions
-        - ./sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+        - ./sonarqube_vol/conf:/opt/sonarqube/conf
+        - ./sonarqube_vol/data:/opt/sonarqube/data
+        - ./sonarqube_vol/extensions:/opt/sonarqube/extensions
+        - ./sonarqube_vol/bundled-plugins:/opt/sonarqube/lib/bundled-plugins
       networks:
         - integration_tools_net
       #command: -Dsonar.web.context=/sonarqube
       ports:
-        - '127.0.0.1:9999:9000'
+        - '9999:9000'
         - '9092:9092'
       environment:
         - SONAR_JDBC_USERNAME=sonar
@@ -49,7 +49,7 @@ services:
       - '8080:8080'
       - '50000:50000'
     volumes:
-      - './jenkins_home:/var/jenkins_home'
+      - './jenkins_vol:/var/jenkins_home'
       - '/var/run/docker.sock:/var/run/docker.sock'
     networks:
       - integration_tools_net
@@ -58,18 +58,27 @@ services:
     image: gitlab/gitlab-ce:latest
     container_name: gitlab
     restart: always
+    hostname: gitlab
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         gitlab_rails['gitlab_shell_ssh_port'] = 8822
     ports:
       - "8000:80"
+      - "8443:8443"
       - "8822:22"
     volumes:
-      - ./gitlab_cofig:/etc/gitlab
-      - ./gitlab_data:/var/opt/gitlab
-      - ./gitlab_logs:/var/log/gitlab
+      - ./gitlab_vol/cofig:/etc/gitlab
+      - ./gitlab_vol/data:/var/opt/gitlab
+      - ./gitlab_vol/logs:/var/log/gitlab
     networks:
       - integration_tools_net
 
 networks:
   integration_tools_net:
+    driver: bridge
+
+volumes:
+  gitlab_vol:
+  sonarqube_vol:
+  jenkins_vol:
+  mysql_vol:
