@@ -2,6 +2,17 @@ version: '3.5'
 
 services:
 
+  jira:
+    image: atlassian/jira-software:latest 
+    container_name: jira
+    ports:
+      - 8888:8888
+    volumes:
+      - ./jira_vol:/var/atlassian/application-data/jira
+    networks: 
+      - integration_tools_net
+    restart: always
+    
   mysql:
     image: mysql:5.7.21
     container_name: mysql
@@ -10,8 +21,11 @@ services:
     volumes:
       - ./mysql_vol/init:/docker-entrypoint-initdb.d
       - ./mysql_vol/conf/:/etc/mysql/conf.d
+      - ./mysql_vol:/var/lib/mysql
     networks:
       - integration_tools_net
+    env_file: 
+      - mysql.env
     environment:
       MYSQL_ROOT_PASSWORD: root
     restart: always
